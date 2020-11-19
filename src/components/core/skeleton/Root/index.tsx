@@ -1,15 +1,11 @@
 import React, { FC } from "react";
 import { Provider } from "react-redux";
 
-import { Store } from "@reduxjs/toolkit";
+import store from "redux/store";
 
 import App from "../App";
 
-type Props = {
-  store: Store;
-};
-
-const Root: FC<Props> = ({ store }) => (
+const Root: FC = () => (
   <Provider store={store}>
     <App />
   </Provider>
