@@ -181,6 +181,7 @@
     ]
   },
   "devDependencies": {
+    "holderjs": "^2.9.7",
     "prettier": "^2.1.2"
   }
 }
