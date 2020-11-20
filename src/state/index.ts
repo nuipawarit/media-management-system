@@ -1,7 +1,14 @@
+import { combineReducers } from "@reduxjs/toolkit";
+import { dataSagas, dataSlice } from "./data";
+
 // Sagas
-const sagas = {};
+const sagas = {
+  ...dataSagas,
+};
 
 // Slice
-const slice = {};
+const slice = combineReducers({
+  data: dataSlice,
+});
 
 export { sagas, slice };
