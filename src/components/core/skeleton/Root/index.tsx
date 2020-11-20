@@ -1,3 +1,4 @@
+import "libraries/icons";
 import React, { FC } from "react";
 import { Provider } from "react-redux";
 
