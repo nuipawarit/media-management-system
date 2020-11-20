@@ -1,13 +1,43 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { Body, Document, Head } from "components/common/base/Page";
 import { Card } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DateRangePicker from "react-bootstrap-daterangepicker";
 import ToggleButton from "components/common/base/ToggleButton";
 import Button from "components/common/base/Button";
 import SearchInput from "components/common/base/SearchInput";
+import { MediaFile } from "types/media";
 
-const MediaManagement: FC = () => {
+type Props = {
+  clearResult: () => void;
+  media: MediaFile[] | null;
+  hasMore: boolean;
+  load: (criteria: { page: number }) => void;
+  loading: boolean;
+  page: number;
+  reset: () => void;
+};
+
+const MediaManagement: FC<Props> = ({
+  clearResult,
+  media,
+  hasMore,
+  load,
+  loading,
+  page,
+  reset,
+}) => {
+  const initialCriteria = { page: 0 };
+
+  useEffect(() => {
+    clearResult();
+    load(initialCriteria);
+
+    return () => {
+      reset();
+    };
+  }, []);
+
   return (
     <Document>
       <Head title="Media Management System" />
@@ -33,8 +63,8 @@ const MediaManagement: FC = () => {
             />
           </div>
           <div className="d-flex flex-fill flex-wrap justify-content-between overflow-auto">
-            {Array.from(Array(100).keys()).map((key) => (
-              <Card key={key} className="mb-3" style={{ width: "12rem" }}>
+            {(media ?? []).map(({ id }) => (
+              <Card key={id} className="mb-3" style={{ width: "12rem" }}>
                 <Card.Img variant="top" src="holder.js/100px180" />
                 <Card.Body>
                   <div className="d-flex ">
