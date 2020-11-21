@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { stringify } from "qs";
 
-export default function <Result = never>({
+function request<Result = never>({
   baseURL = undefined,
   cancelToken = undefined,
   data = undefined,
@@ -96,3 +96,5 @@ export default function <Result = never>({
     return Promise.reject(error);
   });
 }
+
+export default request;
