@@ -5,7 +5,7 @@ type Props = ComponentProps<typeof Button> & {
   active: boolean;
 };
 
-const ToggleButton: FC<Props> = ({ children, ...props }) => {
+const ToggleableButton: FC<Props> = ({ children, ...props }) => {
   return (
     <Button variant="light" {...props}>
       {children}
@@ -13,4 +13,4 @@ const ToggleButton: FC<Props> = ({ children, ...props }) => {
   );
 };
 
-export default ToggleButton;
+export default ToggleableButton;

@@ -3,7 +3,7 @@ import { Body, Document, Head } from "components/common/base/Page";
 import { Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DateRangePicker from "react-bootstrap-daterangepicker";
-import ToggleButton from "components/common/base/ToggleButton";
+import ToggleableButton from "components/common/base/ToggleableButton";
 import Button from "components/common/base/Button";
 import SearchInput from "components/common/base/SearchInput";
 import { MediaFile } from "types/media";
@@ -27,16 +27,16 @@ const MediaManagement: FC<Props> = ({
   page,
   reset,
 }) => {
-  const initialCriteria = { page: 0 };
-
   useEffect(() => {
+    const initialCriteria = { page: 0 };
+
     clearResult();
     load(initialCriteria);
 
     return () => {
       reset();
     };
-  }, []);
+  }, [clearResult, load, reset]);
 
   return (
     <Document>
@@ -45,12 +45,12 @@ const MediaManagement: FC<Props> = ({
         <div className="container d-flex h-100 flex-column">
           <h1 className="display-4 pt-4 pb-3">Media Management</h1>
           <div className="d-flex mb-3">
-            <ToggleButton active={false}>
+            <ToggleableButton active={false}>
               <FontAwesomeIcon icon={["fas", "image"]} fixedWidth /> Image
-            </ToggleButton>
-            <ToggleButton active={false} className="ml-2">
+            </ToggleableButton>
+            <ToggleableButton active={false} className="ml-2">
               <FontAwesomeIcon icon={["fas", "video"]} fixedWidth /> Video
-            </ToggleButton>
+            </ToggleableButton>
             <DateRangePicker>
               <Button variant="light" className="ml-2">
                 <FontAwesomeIcon icon={["far", "calendar-alt"]} fixedWidth />{" "}
