@@ -23,7 +23,7 @@ const mapState = () => (state: RootState) => {
   } = selectMedias(state);
 
   return {
-    media: result,
+    data: result,
     hasMore,
     loading,
     page,

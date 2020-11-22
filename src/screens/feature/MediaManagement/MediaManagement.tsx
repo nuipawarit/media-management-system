@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
 import DateRangePicker from "react-bootstrap-daterangepicker";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -11,11 +10,12 @@ import SearchInput from "components/common/base/SearchInput";
 import ToggleableButton from "components/common/base/ToggleableButton";
 import { MediaFile } from "types/media";
 
+import Card from "./components/Card";
 import Loader from "./components/Loader";
 
 type Props = {
   clearResult: () => void;
-  media: MediaFile[] | null;
+  data: MediaFile[] | null;
   hasMore: boolean;
   load: (criteria: { page: number }) => void;
   loading: boolean;
@@ -25,7 +25,7 @@ type Props = {
 
 const MediaManagement: FC<Props> = ({
   clearResult,
-  media,
+  data,
   hasMore,
   load,
   loading,
@@ -49,27 +49,6 @@ const MediaManagement: FC<Props> = ({
 
     load({ page: page + 1 });
   };
-
-  const renderCard = ({ id }: MediaFile) => (
-    <Card key={id} className="mb-3" style={{ width: "12rem" }}>
-      <Card.Img variant="top" src="holder.js/100px180" />
-      <Card.Body>
-        <div className="d-flex ">
-          <FontAwesomeIcon
-            className="pt-1 mr-1"
-            icon={["far", "image"]}
-            fixedWidth
-            size="lg"
-          />
-          <div className="d-flex flex-column">
-            <small>media-name.jpg</small>
-            <small className="text-muted">167kB | 25 Dec</small>
-            <small className="text-muted">administrator</small>
-          </div>
-        </div>
-      </Card.Body>
-    </Card>
-  );
 
   return (
     <Document>
@@ -104,7 +83,14 @@ const MediaManagement: FC<Props> = ({
               loadMore={loadMore}
               useWindow={false}
             >
-              {(media ?? []).map((mediaFile) => renderCard(mediaFile))}
+              {(data ?? []).map((mediaFile) => (
+                <Card
+                  key={mediaFile.id}
+                  className="mb-3"
+                  data={mediaFile}
+                  style={{ width: "12rem" }}
+                />
+              ))}
             </InfiniteScroll>
           </div>
         </div>
