@@ -2,6 +2,13 @@
   "name": "media-management-system",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start": "node scripts/start.js",
+    "start:server": "ts-node -O {\\\"module\\\":\\\"commonjs\\\"} server/index.ts",
+    "start:server:dev": "ts-node-dev -O {\\\"module\\\":\\\"commonjs\\\"} server/index.ts",
+    "build": "node scripts/build.js",
+    "test": "node scripts/test.js"
+  },
   "dependencies": {
     "@babel/core": "7.12.3",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
@@ -103,10 +110,17 @@
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "5.1.4"
   },
-  "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+  "devDependencies": {
+    "@types/cors": "^2.8.8",
+    "@types/express": "^4.17.9",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "holderjs": "^2.9.7",
+    "import-sort-style-module": "^6.0.0",
+    "prettier": "^2.1.2",
+    "prettier-plugin-import-sort": "0.0.6",
+    "ts-node": "^9.0.0",
+    "ts-node-dev": "^1.0.0"
   },
   "eslintConfig": {
     "extends": [
@@ -183,11 +197,10 @@
       "react-app"
     ]
   },
-  "devDependencies": {
-    "@types/express": "^4.17.9",
-    "express": "^4.17.1",
-    "holderjs": "^2.9.7",
-    "prettier": "^2.1.2",
-    "ts-node": "^9.0.0"
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
   }
 }
