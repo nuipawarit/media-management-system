@@ -66,6 +66,7 @@
     "fs-extra": "^9.0.1",
     "html-webpack-plugin": "4.5.0",
     "identity-obj-proxy": "3.0.0",
+    "import-sort-style-react": "^5.1.0",
     "jest": "26.6.0",
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
@@ -118,7 +119,6 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "holderjs": "^2.9.7",
-    "import-sort-style-module": "^6.0.0",
     "prettier": "^2.1.2",
     "prettier-plugin-import-sort": "0.0.6",
     "ts-node": "^9.0.0",
@@ -201,7 +201,7 @@
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
-      "style": "module",
+      "style": "react",
       "parser": "typescript"
     }
   }
