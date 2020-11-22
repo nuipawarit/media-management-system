@@ -1,8 +1,14 @@
-import express, { Application, Request, Response, Router } from "express";
+import fs from "fs";
+import path from "path";
+
 import bodyParser from "body-parser";
 import cors from "cors";
-import { paginate, isLatest } from "./helper/pagination";
+import express, { Application, Request, Response, Router } from "express";
+
 import books from "./db.json";
+import { isLatest, paginate } from "./helper/pagination";
+
+const imgGen = require("js-image-generator");
 
 const mockMedia = Array.from(Array(100).keys()).map((number) => ({
   id: number,
@@ -27,6 +33,16 @@ router.get("/media", (req: Request, res: Response) => {
       last,
     },
   });
+});
+
+router.get("/media/mocks", (req: Request, res: Response) => {
+  const result = imgGen.generateImage(180, 100, 80, function (
+    err: any,
+    image: { data: any }
+  ) {
+    fs.writeFileSync(path.resolve(__dirname, "media/dummy.jpg"), image.data);
+  });
+  res.status(200).send(result);
 });
 
 router.get("/media/:id", (req: Request, res: Response) => {
