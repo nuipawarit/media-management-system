@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import { shallow } from 'enzyme';
+import { shallow } from "enzyme";
 
-import Body from './index';
+import Body from "./index";
 
 const defaultProps = {
   children: <div>Text</div>,
 };
 
-describe('<Body />', () => {
-  it('should render without crashing', () => {
+describe("<Body />", () => {
+  it("should render without crashing", () => {
     const props = { ...defaultProps };
 
     const wrapper = shallow(<Body {...props} />);
@@ -17,7 +17,7 @@ describe('<Body />', () => {
     expect(wrapper).toBeDefined();
   });
 
-  it('should render children', () => {
+  it("should render children", () => {
     const props = { ...defaultProps };
     const expected = { children: props.children };
 

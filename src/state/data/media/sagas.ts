@@ -1,5 +1,7 @@
 import { all, call, put, select, takeLatest } from "redux-saga/effects";
-import { MediaFile, MediaCriteria, MediaState } from "types/media";
+
+import { MediaCriteria, MediaFile, MediaState } from "types/media";
+
 import { selectSlice } from "./selectors";
 import * as mediaService from "./services";
 import * as actions from "./slice";
@@ -26,9 +28,9 @@ export function* get(action: { payload?: Partial<MediaCriteria> }) {
     yield put(actions.getPending());
 
     const serviceResponse = yield call(mediaService.get, params);
-    const serviceResult = serviceResponse.data.results.data;
+    const serviceResult = serviceResponse.data.result;
     const result = [...(state.data.result ?? []), ...serviceResult];
-    const hasMore = !serviceResponse.data.results.paging.last;
+    const hasMore = !serviceResponse.data.paging.last;
 
     const data = {
       ...state.data,

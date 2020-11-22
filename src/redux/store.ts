@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable global-require */
-import createSagaMiddleware from 'redux-saga';
+import createSagaMiddleware from "redux-saga";
 
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 
 // import { handleError } from './helpers';
-import rootReducer from './reducer';
-import rootSaga from './saga';
+import rootReducer from "./reducer";
+import rootSaga from "./saga";
 
 // Global Redux Saga error handler
 export const catchError = (httpResponse: any) => {
@@ -35,9 +35,9 @@ sagaMiddleware.run(rootSaga);
 // Hot-reloading the root reducer, we can re-import the new version of the root
 // reducer function whenever it's been recompiled, and tell the store to use the
 // new version instead.
-if (process.env.NODE_ENV === 'development' && module.hot) {
-  module.hot.accept('./reducer', () => {
-    store.replaceReducer(require('./reducer').default);
+if (process.env.NODE_ENV === "development" && module.hot) {
+  module.hot.accept("./reducer", () => {
+    store.replaceReducer(require("./reducer").default);
   });
 }
 

@@ -1,11 +1,8 @@
-import configureStore from 'redux-mock-store';
+import configureStore from "redux-mock-store";
 
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware } from "@reduxjs/toolkit";
 
-export function mockStore(
-  preloadedState: any,
-  middlewares: Middleware[] = [],
-) {
+export function mockStore(preloadedState: any, middlewares: Middleware[] = []) {
   const state = preloadedState || {};
   const createStore = configureStore(middlewares);
 
@@ -15,10 +12,10 @@ export function mockStore(
 export const mockState = {
   router: {
     location: {
-      hash: '',
-      key: '',
-      pathname: '/',
-      search: '',
+      hash: "",
+      key: "",
+      pathname: "/",
+      search: "",
       state: undefined,
     },
   },

@@ -1,4 +1,4 @@
-import { slice } from 'state';
+import { slice } from "state";
 
 // Configure root reducer
 const rootReducer = slice;

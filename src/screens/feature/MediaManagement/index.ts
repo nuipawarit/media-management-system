@@ -1,12 +1,16 @@
 import { connect } from "react-redux";
+
 import { Dispatch, bindActionCreators } from "@reduxjs/toolkit";
+
 import { makeSelectMedias } from "state/data/media/selectors";
 import { clearResult, get, reset } from "state/data/media/slice";
 import type RootState from "types/rootState";
+
 import View from "./MediaManagement";
 
 const mapState = () => (state: RootState) => {
   const selectMedias = makeSelectMedias();
+
   const {
     data: {
       criteria: { page },

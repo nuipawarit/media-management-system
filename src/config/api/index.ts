@@ -2,7 +2,7 @@ export default {
   services: {
     mediaManagement: {
       endpoints: {
-        media: `api/media`,
+        media: `api/v1/media`,
       },
       host: "http://localhost:5000",
     },

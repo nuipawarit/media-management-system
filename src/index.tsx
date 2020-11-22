@@ -1,9 +1,13 @@
+import "holderjs";
+
 import React from "react";
 import ReactDOM from "react-dom";
+
 import Root from "components/core/skeleton/Root";
+
 import reportWebVitals from "./reportWebVitals";
+
 import "./style/index.scss";
-import "holderjs";
 
 ReactDOM.render(<Root />, document.getElementById("root"));
 

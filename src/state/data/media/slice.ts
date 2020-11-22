@@ -1,14 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+import PAGINATION from "config/app/pagination";
 import { commonAsyncState, commonState } from "constants/common/state";
 import { generateCommonAsyncReducer } from "helpers/state";
-import { MediaFile, MediaCriteria, MediaState } from "types/media";
+import { MediaCriteria, MediaFile, MediaState } from "types/media";
 
 export const initialState: MediaState = {
   ...commonState,
   data: {
     criteria: {
-      count: 20,
+      count: PAGINATION.default.count,
       page: 0,
     },
     hasMore: true,

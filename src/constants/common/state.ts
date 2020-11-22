@@ -1,4 +1,4 @@
-import { CommonAsyncState, CommonState } from 'types/state';
+import { CommonAsyncState, CommonState } from "types/state";
 
 export const commonAsyncState: CommonAsyncState = {
   error: null,

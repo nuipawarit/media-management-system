@@ -1,5 +1,5 @@
 export type Sort = {
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
   property: string;
 };
 

@@ -1,12 +1,17 @@
-import React, { FC, useEffect } from "react";
-import { Body, Document, Head } from "components/common/base/Page";
+import React, { FC, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DateRangePicker from "react-bootstrap-daterangepicker";
-import ToggleableButton from "components/common/base/ToggleableButton";
+import InfiniteScroll from "react-infinite-scroller";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import Button from "components/common/base/Button";
+import { Body, Document, Head } from "components/common/base/Page";
 import SearchInput from "components/common/base/SearchInput";
+import ToggleableButton from "components/common/base/ToggleableButton";
 import { MediaFile } from "types/media";
+
+import Loader from "./components/Loader";
 
 type Props = {
   clearResult: () => void;
@@ -27,16 +32,44 @@ const MediaManagement: FC<Props> = ({
   page,
   reset,
 }) => {
-  useEffect(() => {
-    const initialCriteria = { page: 0 };
+  const [isInitialedList, setIsInitialedList] = useState(false);
 
+  useEffect(() => {
+    setIsInitialedList(true);
     clearResult();
-    load(initialCriteria);
 
     return () => {
       reset();
     };
   }, [clearResult, load, reset]);
+
+  const loadMore = () => {
+    console.log(page);
+    if (loading || !hasMore) return;
+
+    load({ page: page + 1 });
+  };
+
+  const renderCard = ({ id }: MediaFile) => (
+    <Card key={id} className="mb-3" style={{ width: "12rem" }}>
+      <Card.Img variant="top" src="holder.js/100px180" />
+      <Card.Body>
+        <div className="d-flex ">
+          <FontAwesomeIcon
+            className="pt-1 mr-1"
+            icon={["far", "image"]}
+            fixedWidth
+            size="lg"
+          />
+          <div className="d-flex flex-column">
+            <small>media-name.jpg</small>
+            <small className="text-muted">167kB | 25 Dec</small>
+            <small className="text-muted">administrator</small>
+          </div>
+        </div>
+      </Card.Body>
+    </Card>
+  );
 
   return (
     <Document>
@@ -62,27 +95,17 @@ const MediaManagement: FC<Props> = ({
               placeholder="Search by media name"
             />
           </div>
-          <div className="d-flex flex-fill flex-wrap justify-content-between overflow-auto">
-            {(media ?? []).map(({ id }) => (
-              <Card key={id} className="mb-3" style={{ width: "12rem" }}>
-                <Card.Img variant="top" src="holder.js/100px180" />
-                <Card.Body>
-                  <div className="d-flex ">
-                    <FontAwesomeIcon
-                      className="pt-1 mr-1"
-                      icon={["far", "image"]}
-                      fixedWidth
-                      size="lg"
-                    />
-                    <div className="d-flex flex-column">
-                      <small>media-name.jpg</small>
-                      <small className="text-muted">167kB | 25 Dec</small>
-                      <small className="text-muted">administrator</small>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            ))}
+          <div className="flex-fill overflow-auto">
+            <InfiniteScroll
+              className="d-flex flex-wrap justify-content-between"
+              hasMore={hasMore}
+              initialLoad={!isInitialedList}
+              loader={<Loader key="loader">Loading ...</Loader>}
+              loadMore={loadMore}
+              useWindow={false}
+            >
+              {(media ?? []).map((mediaFile) => renderCard(mediaFile))}
+            </InfiniteScroll>
           </div>
         </div>
       </Body>
