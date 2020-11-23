@@ -5,15 +5,11 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Application, Request, Response, Router } from "express";
 
-import books from "./db.json";
+import db from "./helper/database";
 import { isLatest, paginate } from "./helper/pagination";
+import { getRandomId } from "./helper/random";
 
 const imgGen = require("js-image-generator");
-
-const mockMedia = Array.from(Array(100).keys()).map((number) => ({
-  id: number,
-}));
-
 const app: Application = express();
 const router: Router = express.Router();
 
@@ -24,11 +20,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 router.get("/media", (req: Request, res: Response) => {
   const count = +(req.query.count || 20);
   const page = +(req.query.page || 1);
-  const data = paginate(mockMedia, count, page);
-  const last = isLatest(mockMedia, count, page);
+
+  const data = db.get("media").value();
+  const result = paginate(data, count, page);
+  const last = isLatest(data, count, page);
 
   res.json({
-    result: data,
+    result,
     paging: {
       last,
     },
@@ -36,32 +34,60 @@ router.get("/media", (req: Request, res: Response) => {
 });
 
 router.get("/media/mocks", (req: Request, res: Response) => {
-  const result = imgGen.generateImage(180, 100, 80, function (
-    err: any,
-    image: { data: any }
-  ) {
-    fs.writeFileSync(path.resolve(__dirname, "media/dummy.jpg"), image.data);
-  });
-  res.status(200).send(result);
+  const count = +(req.query.count || 1);
+
+  for (let i = 0; i < count; i++) {
+    const mediaId = getRandomId();
+
+    imgGen.generateImage(180, 100, 80, function (
+      err: any,
+      image: { data: any }
+    ) {
+      const author = "admin";
+      const extension = "jpg";
+      const name = `mock-${mediaId}`;
+      const size = image.data.length;
+      const uploadTime = +new Date();
+      const filePath = path.resolve(__dirname, `media/${name}.${extension}`);
+      const thumbnail = `${name}-thumb.png`;
+      const thumbnailPath = path.resolve(__dirname, `media/${thumbnail}`);
+
+      fs.writeFileSync(filePath, image.data);
+
+      db.get("media")
+        .push({
+          author,
+          extension,
+          id: mediaId,
+          name,
+          size,
+          thumbnail,
+          uploadTime,
+        })
+        .write();
+    });
+  }
+
+  res.status(200).send("succeeded");
 });
 
 router.get("/media/:id", (req: Request, res: Response) => {
-  res.json(books.find((book) => book.id === req.params.id));
+  // res.json(books.find((book) => book.id === req.params.id));
 });
 
 router.post("/media", (req: Request, res: Response) => {
-  books.push(req.body);
+  // books.push(req.body);
   res.status(201).json(req.body);
 });
 
 router.put("/media/:id", (req: Request, res: Response) => {
-  const updateIndex = books.findIndex((book) => book.id === req.params.id);
-  res.json(Object.assign(books[updateIndex], req.body));
+  // const updateIndex = books.findIndex((book) => book.id === req.params.id);
+  // res.json(Object.assign(books[updateIndex], req.body));
 });
 
 router.delete("/media/:id", (req: Request, res: Response) => {
-  const deleteIndex = books.findIndex((book) => book.id === req.params.id);
-  books.splice(deleteIndex, 1);
+  // const deleteIndex = books.findIndex((book) => book.id === req.params.id);
+  // books.splice(deleteIndex, 1);
   res.status(204).send();
 });
 
