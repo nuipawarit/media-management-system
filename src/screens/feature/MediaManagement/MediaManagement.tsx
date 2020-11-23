@@ -44,7 +44,6 @@ const MediaManagement: FC<Props> = ({
   }, [clearResult, load, reset]);
 
   const loadMore = () => {
-    console.log(page);
     if (loading || !hasMore) return;
 
     load({ page: page + 1 });
@@ -76,7 +75,7 @@ const MediaManagement: FC<Props> = ({
           </div>
           <div className="flex-fill overflow-auto">
             <InfiniteScroll
-              className="d-flex flex-wrap justify-content-between"
+              className="d-flex flex-wrap "
               hasMore={hasMore}
               initialLoad={!isInitialedList}
               loader={<Loader key="loader">Loading ...</Loader>}
@@ -86,7 +85,7 @@ const MediaManagement: FC<Props> = ({
               {(data ?? []).map((mediaFile) => (
                 <Card
                   key={mediaFile.id}
-                  className="mb-3"
+                  className="mb-3 mr-3"
                   data={mediaFile}
                   style={{ width: "12rem" }}
                 />
