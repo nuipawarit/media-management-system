@@ -7,9 +7,12 @@ export interface MediaCriteria extends PaginateCriteria {
 }
 
 export type MediaFile = {
+  author: string;
+  extension: "jpg" | "jpeg" | "png" | "mp4";
   id: string;
-  // name: string;
-  // status: boolean;
+  name: string;
+  size: number;
+  uploadTime: number;
 };
 
 export interface MediaState extends CommonState {
