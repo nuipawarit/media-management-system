@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import DateRangePicker from "react-bootstrap-daterangepicker";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -75,17 +75,21 @@ const MediaManagement: FC<Props> = ({
           </div>
           <div className="flex-fill overflow-auto">
             <InfiniteScroll
-              className="d-flex flex-wrap "
+              className="d-flex flex-wrap justify-content-between"
               hasMore={hasMore}
               initialLoad={!isInitialedList}
-              loader={<Loader key="loader">Loading ...</Loader>}
+              loader={
+                <Loader key="loader" className="w-100">
+                  Loading ...
+                </Loader>
+              }
               loadMore={loadMore}
               useWindow={false}
             >
               {(data ?? []).map((mediaFile) => (
                 <Card
                   key={mediaFile.id}
-                  className="mb-3 mr-3"
+                  className="mb-3"
                   data={mediaFile}
                   style={{ width: "12rem" }}
                 />
