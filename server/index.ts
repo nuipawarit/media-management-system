@@ -15,9 +15,13 @@ const router: Router = express.Router();
 const simpleThumbnail = require("simple-thumbnail");
 const nodeThumbnail = require("node-thumbnail").thumb;
 
+const mediaPath = path.resolve(__dirname, `media`);
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use("/static/media", express.static(mediaPath));
 
 router.get("/media", (req: Request, res: Response) => {
   const count = +(req.query.count || 20);
@@ -50,7 +54,6 @@ router.get("/media/mocks", (req: Request, res: Response) => {
       const name = `mock-${mediaId}`;
       const size = image.data.length;
       const uploadTime = +new Date();
-      const mediaPath = path.resolve(__dirname, `media`);
       const filePath = `${mediaPath}/${name}.${extension}`;
       const thumbnail = `${name}-thumb.jpg`;
       const thumbnail1Path = `${mediaPath}/${thumbnail}`;
