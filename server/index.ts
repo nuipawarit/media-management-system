@@ -12,6 +12,8 @@ import { getRandomId } from "./helper/random";
 const imgGen = require("js-image-generator");
 const app: Application = express();
 const router: Router = express.Router();
+const simpleThumbnail = require("simple-thumbnail");
+const nodeThumbnail = require("node-thumbnail").thumb;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -48,12 +50,28 @@ router.get("/media/mocks", (req: Request, res: Response) => {
       const name = `mock-${mediaId}`;
       const size = image.data.length;
       const uploadTime = +new Date();
-      const filePath = path.resolve(__dirname, `media/${name}.${extension}`);
-      const thumbnail = `${name}-thumb.png`;
-      const thumbnailPath = path.resolve(__dirname, `media/${thumbnail}`);
+      const mediaPath = path.resolve(__dirname, `media`);
+      const filePath = `${mediaPath}/${name}.${extension}`;
+      const thumbnail = `${name}-thumb.jpg`;
+      const thumbnail1Path = `${mediaPath}/${thumbnail}`;
 
+      // Save file to server storage
       fs.writeFileSync(filePath, image.data);
 
+      // Save thumbnail file using FFmpeg method
+      simpleThumbnail(filePath, thumbnail1Path, "200x?")
+        .then(() => console.log("done!"))
+        .catch(() => {
+          // Using alternative method on first method is failed
+          nodeThumbnail({
+            destination: mediaPath,
+            source: filePath,
+            suffix: "-thumb",
+            width: 200,
+          });
+        });
+
+      // Save file data to database
       db.get("media")
         .push({
           author,
