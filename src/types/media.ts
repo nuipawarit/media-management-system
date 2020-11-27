@@ -12,6 +12,7 @@ export type MediaFile = {
   id: string;
   name: string;
   size: number;
+  thumbnail: string;
   uploadTime: number;
 };
 
