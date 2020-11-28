@@ -76,7 +76,7 @@ export function* update(action: { payload: MediaFile }) {
 
     if (state.data.result === null) return;
 
-    const mediaId = action.payload.id;
+    const mediaId = action.payload.id || "";
 
     yield put(actions.updatePending());
 
@@ -113,7 +113,7 @@ export function* remove(action: { payload: MediaFile }) {
 
     if (state.data.result === null) return;
 
-    const mediaId = action.payload.id;
+    const mediaId = action.payload.id || "";
 
     yield put(actions.removePending());
 

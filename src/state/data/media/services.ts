@@ -1,13 +1,7 @@
 import API_CONFIG from "config/api";
 import request from "helpers/request";
 
-export type Request = {
-  id: string;
-};
-
-export type Response = {
-  id: string;
-}[];
+import { MediaFile } from "../../../types/media";
 
 export const get = (params: { count?: number; name?: string; page?: number }) =>
   request<Response>({
@@ -21,16 +15,16 @@ export const get = (params: { count?: number; name?: string; page?: number }) =>
     url: API_CONFIG.services.mediaManagement.endpoints.media,
   });
 
-export const add = (data: Request) =>
-  request<Response>({
+export const add = (data: MediaFile) =>
+  request<MediaFile[]>({
     baseURL: API_CONFIG.services.mediaManagement.host,
     data,
     method: "POST",
     url: API_CONFIG.services.mediaManagement.endpoints.media,
   });
 
-export const update = (id: string, data: Request) =>
-  request<Response>({
+export const update = (id: string, data: MediaFile) =>
+  request<MediaFile[]>({
     baseURL: API_CONFIG.services.mediaManagement.host,
     data,
     method: "PUT",
@@ -38,7 +32,7 @@ export const update = (id: string, data: Request) =>
   });
 
 export const remove = (id: string) =>
-  request<Response>({
+  request<MediaFile[]>({
     baseURL: API_CONFIG.services.mediaManagement.host,
     method: "DELETE",
     url: `${API_CONFIG.services.mediaManagement.endpoints.media}/${id}`,
