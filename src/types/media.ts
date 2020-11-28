@@ -8,11 +8,12 @@ export interface MediaCriteria extends PaginateCriteria {
 
 export type MediaFile = {
   author: string;
-  extension: "jpg" | "jpeg" | "png" | "mp4";
-  id: string;
+  extension: string;
+  file?: File;
+  id?: string;
   name: string;
   size: number;
-  thumbnail: string;
+  thumbnail?: string;
   uploadTime: number;
 };
 
