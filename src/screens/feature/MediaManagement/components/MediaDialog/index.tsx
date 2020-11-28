@@ -1,11 +1,14 @@
 import React, { FC } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 
+import { useFormik } from "formik";
+import { map } from "lodash";
 import styled from "styled-components";
 
 import { MediaFile } from "types/media";
+import { CommonAsyncState } from "types/state";
 
-import { CommonAsyncState } from "../../../../../types/state";
+const DEFAULT_AUTHOR = "admin";
 
 const FullscreenModal = styled(Modal)`
   .modal-dialog {
@@ -26,9 +29,8 @@ const FullscreenModal = styled(Modal)`
 `;
 
 type Props = {
-  data?: MediaFile;
-  hide: () => void;
-  isShow: boolean;
+  files?: FileList | MediaFile;
+  onHide: () => void;
   method?: "add" | "edit";
   status?: {
     add: CommonAsyncState;
@@ -36,16 +38,40 @@ type Props = {
   };
 };
 
-const MediaDialog: FC<Props> = ({
-  data,
-  hide,
-  isShow,
-  method = null,
-  status,
-}) => {
+const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
+  const isShow = method !== undefined;
   const title = method === "add" ? "Add new media" : "Edit media";
 
-  const onHideHandler = () => hide();
+  let initialValues: MediaFile[] = [];
+
+  if (files instanceof FileList) {
+    initialValues = map(files, (file) => ({
+      author: DEFAULT_AUTHOR,
+      extension: file.name.substr(file.name.lastIndexOf(".") + 1),
+      file,
+      name: file.name,
+      size: file.size,
+      uploadTime: file.lastModified,
+    }));
+  } else if (files) {
+    initialValues = [files];
+  }
+  console.log(initialValues);
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues,
+    onSubmit: (value) => {
+      if (method === "add") {
+        // add(value);
+      } else if (method === "edit") {
+        // update(value);
+      }
+    },
+    // validationSchema: filesValidators,
+  });
+
+  const onHideHandler = () => onHide();
 
   const renderSubmitButton = () => {
     let btnText = "";
@@ -71,7 +97,7 @@ const MediaDialog: FC<Props> = ({
         {btnText}
       </Button>
     );
-  };;
+  };
 
   return (
     <FullscreenModal
@@ -84,7 +110,7 @@ const MediaDialog: FC<Props> = ({
     >
       <Form
         className="min-vh-100 d-flex flex-column"
-        // onSubmit={formik.handleSubmit}
+        onSubmit={formik.handleSubmit}
       >
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
