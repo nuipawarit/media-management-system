@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import DateRangePicker from "react-bootstrap-daterangepicker";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -10,8 +10,10 @@ import SearchInput from "components/common/base/SearchInput";
 import ToggleableButton from "components/common/base/ToggleableButton";
 import { MediaFile } from "types/media";
 
+import AddMediaButton from "./components/AddMediaButton";
 import Card from "./components/Card";
 import Loader from "./components/Loader";
+import MediaDialog from "./components/MediaDialog";
 
 type Props = {
   clearResult: () => void;
@@ -33,6 +35,10 @@ const MediaManagement: FC<Props> = ({
   reset,
 }) => {
   const [isInitialedList, setIsInitialedList] = useState(false);
+  const [mediaDialogState, setMediaDialogState] = useState<{
+    method?: "add" | "edit";
+    files?: FileList | MediaFile;
+  }>({});
 
   useEffect(() => {
     setIsInitialedList(true);
@@ -47,6 +53,19 @@ const MediaManagement: FC<Props> = ({
     if (loading || !hasMore) return;
 
     load({ page: page + 1 });
+  };
+
+  const onClickCardHandler = (files: MediaFile) => {
+    setMediaDialogState({ method: "edit", files });
+  };
+
+  const onFileChangeHandler = (files: FileList) => {
+    console.log(files);
+    if (files.length > 0) setMediaDialogState({ method: "add", files });
+  };
+
+  const onHildeMediaDialogHandler = () => {
+    setMediaDialogState({});
   };
 
   return (
@@ -91,11 +110,18 @@ const MediaManagement: FC<Props> = ({
                   key={mediaFile.id}
                   className="mb-3"
                   data={mediaFile}
+                  onClick={onClickCardHandler}
                   style={{ width: "12rem" }}
                 />
               ))}
             </InfiniteScroll>
           </div>
+          <AddMediaButton onFileChange={onFileChangeHandler} />
+          <MediaDialog
+            files={mediaDialogState.files}
+            method={mediaDialogState.method}
+            onHide={onHildeMediaDialogHandler}
+          />
         </div>
       </Body>
     </Document>
