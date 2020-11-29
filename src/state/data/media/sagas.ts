@@ -45,7 +45,7 @@ export function* get(action: { payload?: Partial<MediaCriteria> }) {
   }
 }
 
-export function* add(action: { payload: MediaFile }) {
+export function* add(action: { payload: { files: MediaFile[] } }) {
   try {
     const state: MediaState = yield select(selectSlice);
 

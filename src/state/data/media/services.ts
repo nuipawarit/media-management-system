@@ -1,3 +1,5 @@
+import { serialize } from "object-to-formdata";
+
 import API_CONFIG from "config/api";
 import request from "helpers/request";
 
@@ -15,13 +17,17 @@ export const get = (params: { count?: number; name?: string; page?: number }) =>
     url: API_CONFIG.services.mediaManagement.endpoints.media,
   });
 
-export const add = (data: MediaFile) =>
-  request<MediaFile[]>({
+export const add = (data: { files: MediaFile[] }) => {
+  const formData = serialize(data, { indices: true });
+  
+  return request<MediaFile[]>({
     baseURL: API_CONFIG.services.mediaManagement.host,
-    data,
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" },
     method: "POST",
     url: API_CONFIG.services.mediaManagement.endpoints.media,
   });
+};
 
 export const update = (id: string, data: MediaFile) =>
   request<MediaFile[]>({

@@ -24,7 +24,10 @@ export const initialState: MediaState = {
 };
 
 const asyncReducer = {
-  add: generateCommonAsyncReducer<MediaState, MediaFile>(initialState, "add"),
+  add: generateCommonAsyncReducer<MediaState, { files: MediaFile[] }>(
+    initialState,
+    "add"
+  ),
   get: generateCommonAsyncReducer<
     MediaState,
     Partial<MediaCriteria> | undefined
