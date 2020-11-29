@@ -5,5 +5,5 @@ import type RootState from "types/rootState";
 
 export const selectSlice = (state: RootState): MediaState => state.data.media;
 
-export const makeSelectMedias = () =>
+export const makeSelectMedia = () =>
   createSelector(selectSlice, (slice) => slice);
