@@ -1,10 +1,13 @@
 import React, { FC } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Col, Form, Image, Modal, Row } from "react-bootstrap";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import fileSize from "filesize";
 import { useFormik } from "formik";
-import { map } from "lodash";
+import { has, isObject, map } from "lodash";
 import styled from "styled-components";
 
+import fileSchema from "schemas/files";
 import { MediaFile } from "types/media";
 import { CommonAsyncState } from "types/state";
 
@@ -42,21 +45,22 @@ const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
   const isShow = method !== undefined;
   const title = method === "add" ? "Add new media" : "Edit media";
 
-  let initialValues: MediaFile[] = [];
+  let initialValues: { files: MediaFile[] } = { files: [] };
 
   if (files instanceof FileList) {
-    initialValues = map(files, (file) => ({
-      author: DEFAULT_AUTHOR,
-      extension: file.name.substr(file.name.lastIndexOf(".") + 1),
-      file,
-      name: file.name,
-      size: file.size,
-      uploadTime: file.lastModified,
-    }));
+    initialValues = {
+      files: map(files, (file) => ({
+        author: DEFAULT_AUTHOR,
+        extension: file.name.substr(file.name.lastIndexOf(".") + 1),
+        file,
+        name: file.name.substr(0, file.name.lastIndexOf(".")),
+        size: file.size,
+        uploadTime: file.lastModified,
+      })),
+    };
   } else if (files) {
-    initialValues = [files];
+    initialValues = { files: [files] };
   }
-  console.log(initialValues);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -68,10 +72,17 @@ const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
         // update(value);
       }
     },
-    // validationSchema: filesValidators,
+    validationSchema: fileSchema,
   });
 
   const onHideHandler = () => onHide();
+
+  const onRemoveClickHandler = (index: number) => {
+    let newValues = formik.values.files;
+    newValues.splice(index, 1);
+    console.log(newValues);
+    formik.setFieldValue("files", newValues);
+  };
 
   const renderSubmitButton = () => {
     let btnText = "";
@@ -99,6 +110,73 @@ const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
     );
   };
 
+  const renderFileDetail = (index: number, src: string) => {
+    const handleChange = formik.handleChange;
+    const handleBlur = formik.handleBlur;
+    const values = (formik.values.files || [])[index];
+    const errors = (formik.errors.files || [])[index];
+    const errorMessage = map(errors, (error: string) => (
+      <div key={error}>{error}</div>
+    ));
+
+    const feedbackDisplay = errorMessage ? "block" : undefined;
+    const uploadFileSize = fileSize(formik.values.files[index].size, {
+      round: 0,
+    });
+
+    return (
+      <Row key={index} className="py-3 border-bottom">
+        <Col>
+          <Image src={src} thumbnail />
+        </Col>
+        <Col>
+          <Form.Group>
+            <Form.Label className="small">Name:</Form.Label>
+            <Form.Control
+              name={`files[${index}].name`}
+              type="text"
+              isInvalid={isObject(errors) && has(errors, "name")}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              size="sm"
+              value={values.name}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label className="small">Author:</Form.Label>
+            <Form.Control
+              name={`files[${index}].author`}
+              type="text"
+              isInvalid={isObject(errors) && has(errors, "author")}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              size="sm"
+              value={values.author}
+            />
+          </Form.Group>
+          <div className="d-flex align-items-center justify-content-between">
+            <span className="small text-muted">Size: {uploadFileSize}</span>
+            <Button variant="link" onClick={() => onRemoveClickHandler(index)}>
+              <FontAwesomeIcon icon={["far", "trash-alt"]} />
+            </Button>
+          </div>
+          <Form.Control.Feedback
+            type="invalid"
+            style={{ display: feedbackDisplay }}
+          >
+            {errorMessage}
+          </Form.Control.Feedback>
+        </Col>
+      </Row>
+    );
+  };
+
+  const renderFileList = () =>
+    formik.values.files.map(({ file }, index) => {
+      const fileSrc = URL.createObjectURL(file);
+      return renderFileDetail(index, fileSrc);
+    });
+
   return (
     <FullscreenModal
       animation={false}
@@ -115,7 +193,7 @@ const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>xxx</Modal.Body>
+        <Modal.Body>{renderFileList()}</Modal.Body>
         <Modal.Footer>
           <Button
             onClick={onHideHandler}
