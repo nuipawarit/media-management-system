@@ -60,7 +60,6 @@ const MediaManagement: FC<Props> = ({
   };
 
   const onFileChangeHandler = (files: FileList) => {
-    console.log(files);
     if (files.length > 0) setMediaDialogState({ method: "add", files });
   };
 
