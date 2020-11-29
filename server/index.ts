@@ -4,6 +4,7 @@ import path from "path";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Application, Request, Response, Router } from "express";
+import fileUpload from "express-fileupload";
 
 import db from "./helper/database";
 import { isLatest, paginate } from "./helper/pagination";
@@ -20,6 +21,7 @@ const mediaPath = path.resolve(__dirname, `media`);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(fileUpload());
 
 app.use("/static/media", express.static(mediaPath));
 
@@ -93,11 +95,15 @@ router.get("/media/mocks", (req: Request, res: Response) => {
 });
 
 router.get("/media/:id", (req: Request, res: Response) => {
-  // res.json(books.find((book) => book.id === req.params.id));
+  const id = req.params.id;
+  const data = db.get("media").find({ id }).value();
+
+  res.json({ result: data });
 });
 
 router.post("/media", (req: Request, res: Response) => {
   // books.push(req.body);
+  console.log(req.files);
   res.status(201).json(req.body);
 });
 
