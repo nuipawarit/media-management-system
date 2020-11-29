@@ -32,6 +32,8 @@ const FullscreenModal = styled(Modal)`
 `;
 
 type Props = {
+  add?: (value: { files: MediaFile[] }) => void;
+  update?: (value: MediaFile) => void;
   files?: FileList | MediaFile;
   onHide: () => void;
   method?: "add" | "edit";
@@ -41,7 +43,13 @@ type Props = {
   };
 };
 
-const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
+const MediaDialog: FC<Props> = ({
+  add = () => {},
+  files,
+  onHide,
+  method,
+  status,
+}) => {
   const isShow = method !== undefined;
   const title = method === "add" ? "Add new media" : "Edit media";
 
@@ -67,7 +75,7 @@ const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
     initialValues,
     onSubmit: (value) => {
       if (method === "add") {
-        // add(value);
+        add(value);
       } else if (method === "edit") {
         // update(value);
       }
@@ -78,21 +86,19 @@ const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
   const onHideHandler = () => onHide();
 
   const onRemoveClickHandler = (index: number) => {
-    let newValues = formik.values.files;
-    newValues.splice(index, 1);
-    console.log(newValues);
-    formik.setFieldValue("files", newValues);
+    let files = [...formik.values.files];
+    files.splice(index, 1);
+    formik.setFieldValue("files", files, true);
   };
 
   const renderSubmitButton = () => {
     let btnText = "";
     let disabled = false;
 
-    // if (status.add.loading || status.update.loading) {
-    //   btnText = "Submitting....";
-    //   disabled = true;
-    // } else
-    if (method === "add") {
+    if (status?.add.loading || status?.update.loading) {
+      btnText = "Submitting....";
+      disabled = true;
+    } else if (method === "add") {
       btnText = "Save";
     } else if (method === "edit") {
       btnText = "Save";
@@ -171,11 +177,12 @@ const MediaDialog: FC<Props> = ({ files, onHide, method, status }) => {
     );
   };
 
-  const renderFileList = () =>
-    formik.values.files.map(({ file }, index) => {
+  const renderFileList = () => {
+    return formik.values.files.map(({ file }, index) => {
       const fileSrc = URL.createObjectURL(file);
       return renderFileDetail(index, fileSrc);
     });
+  };
 
   return (
     <FullscreenModal
