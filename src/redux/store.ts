@@ -25,7 +25,12 @@ const sagaMiddleware = createSagaMiddleware({
 
 // Create Redux store instance
 const store = configureStore({
-  middleware: [...getDefaultMiddleware(), sagaMiddleware],
+  middleware: [
+    ...getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+    sagaMiddleware,
+  ],
   reducer: rootReducer,
 });
 
