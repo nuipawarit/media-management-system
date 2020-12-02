@@ -110,7 +110,6 @@ const MediaManagement: FC<Props> = ({
                   className="mb-3"
                   data={mediaFile}
                   onClick={onClickCardHandler}
-                  style={{ width: "12rem" }}
                 />
               ))}
             </InfiniteScroll>

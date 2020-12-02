@@ -3,17 +3,37 @@ import { Card as BsCard } from "react-bootstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import fileSize from "filesize";
+import styled from "styled-components";
 
 import MEDIA from "config/app/media";
 import { shortDateFormat } from "helpers/datetime";
 import { MediaFile } from "types/media";
+
+const Box = styled(BsCard)`
+  width: calc(12rem + 2px);
+`;
+
+const Image = styled(BsCard.Img)`
+  height: 6.75rem;
+  width: 12rem;
+`;
+
+const Body = styled(BsCard.Body)`
+  display: flex;
+`;
+
+const Detail = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+`;
 
 type Props = ComponentProps<typeof BsCard> & {
   data: MediaFile;
 };
 
 const Card: FC<Props> = ({
-  data: { author, name, size, thumbnail, uploadTime },
+  data: { author, extension, name, size, thumbnail, uploadTime },
   ...restProps
 }) => {
   const imageSrc = `${MEDIA.mediaManagement.path}/${thumbnail}`;
@@ -21,26 +41,26 @@ const Card: FC<Props> = ({
   const uploadFileSize = fileSize(size, { round: 0 });
 
   return (
-    <BsCard {...restProps}>
-      <BsCard.Img variant="top" src={imageSrc} />
-      <BsCard.Body>
-        <div className="d-flex ">
-          <FontAwesomeIcon
-            className="pt-1 mr-1"
-            icon={["far", "image"]}
-            fixedWidth
-            size="lg"
-          />
-          <div className="d-flex flex-column">
-            <small>{name}</small>
-            <small className="text-muted">
-              {uploadFileSize} | {uploadDate}
-            </small>
-            <small className="text-muted">{author}</small>
-          </div>
-        </div>
-      </BsCard.Body>
-    </BsCard>
+    <Box {...restProps}>
+      <Image variant="top" src={imageSrc} />
+      <Body>
+        <FontAwesomeIcon
+          className="pt-1 mr-1"
+          icon={["far", "image"]}
+          fixedWidth
+          size="lg"
+        />
+        <Detail>
+          <small className="text-truncate" title={`${name}.${extension}`}>
+            {name}.{extension}
+          </small>
+          <small className="text-muted text-truncate">
+            {uploadFileSize} | {uploadDate}
+          </small>
+          <small className="text-muted text-truncate">{author}</small>
+        </Detail>
+      </Body>
+    </Box>
   );
 };
 
