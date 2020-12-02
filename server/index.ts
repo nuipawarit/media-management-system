@@ -5,10 +5,13 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Application, Request, Response, Router } from "express";
 import fileUpload from "express-fileupload";
+import { isArray, orderBy } from "lodash";
+import qs from "qs";
 
 import db from "./helper/database";
 import { isLatest, paginate } from "./helper/pagination";
 import { getRandomId } from "./helper/random";
+import { MediaFile } from "./types/media";
 
 const imgGen = require("js-image-generator");
 const app: Application = express();
@@ -30,8 +33,9 @@ router.get("/media", (req: Request, res: Response) => {
   const page = +(req.query.page || 1);
 
   const data = db.get("media").value();
-  const result = paginate(data, count, page);
-  const last = isLatest(data, count, page);
+  const ordered = orderBy(data, "uploadTime", "asc");
+  const result = paginate(ordered, count, page);
+  const last = isLatest(ordered, count, page);
 
   res.json({
     result,
@@ -64,17 +68,15 @@ router.get("/media/mocks", (req: Request, res: Response) => {
       fs.writeFileSync(filePath, image.data);
 
       // Save thumbnail file using FFmpeg method
-      simpleThumbnail(filePath, thumbnail1Path, "200x?")
-        .then(() => console.log("done!"))
-        .catch(() => {
-          // Using alternative method on first method is failed
-          nodeThumbnail({
-            destination: mediaPath,
-            source: filePath,
-            suffix: "-thumb",
-            width: 200,
-          });
+      simpleThumbnail(filePath, thumbnail1Path, "200x?").catch(() => {
+        // Using alternative method on first method is failed
+        nodeThumbnail({
+          destination: mediaPath,
+          source: filePath,
+          suffix: "-thumb",
+          width: 200,
         });
+      });
 
       // Save file data to database
       db.get("media")
@@ -102,9 +104,56 @@ router.get("/media/:id", (req: Request, res: Response) => {
 });
 
 router.post("/media", (req: Request, res: Response) => {
-  // books.push(req.body);
-  console.log(req.files);
-  res.status(201).json(req.body);
+  const bodyData: any = qs.parse(req.body).files;
+
+  if (!isArray(bodyData)) throw new Error("Unexpected input");
+
+  const result = bodyData.map(
+    (
+      { author, extension, name, size, uploadTime }: MediaFile,
+      index: number
+    ) => {
+      const mediaId = getRandomId();
+      const filePath = `${mediaPath}/${mediaId}.${extension}`;
+      const thumbnail = `${mediaId}-thumb.jpg`;
+      const thumbnail1Path = `${mediaPath}/${thumbnail}`;
+
+      const file = req.files?.[`files[${index}][file]`];
+
+      if (!file) throw new Error("Unexpected files payload");
+
+      // Save file to server storage
+      fs.writeFileSync(filePath, file.data);
+
+      // Save thumbnail file using FFmpeg method
+      simpleThumbnail(filePath, thumbnail1Path, "200x?").catch(() => {
+        // Using alternative method on first method is failed
+        nodeThumbnail({
+          destination: mediaPath,
+          source: filePath,
+          suffix: "-thumb",
+          width: 200,
+        });
+      });
+
+      const data = {
+        author,
+        extension,
+        id: mediaId,
+        name,
+        size,
+        thumbnail,
+        uploadTime,
+      };
+
+      // Save file data to database
+      db.get("media").push(data).write();
+
+      return data;
+    }
+  );
+
+  res.status(201).json(result);
 });
 
 router.put("/media/:id", (req: Request, res: Response) => {
