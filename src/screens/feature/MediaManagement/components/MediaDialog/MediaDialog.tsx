@@ -1,5 +1,13 @@
-import React, { FC } from "react";
-import { Button, Col, Form, Image, Modal, Row } from "react-bootstrap";
+import React, { FC, useEffect, useState } from "react";
+import {
+  Button,
+  Col,
+  Form,
+  Image,
+  InputGroup,
+  Modal,
+  Row,
+} from "react-bootstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import fileSize from "filesize";
@@ -10,6 +18,9 @@ import styled from "styled-components";
 import fileSchema from "schemas/files";
 import { MediaFile } from "types/media";
 import { CommonAsyncState } from "types/state";
+
+import MEDIA from "../../../../../config/app/media";
+import { shortDateFormat } from "../../../../../helpers/datetime";
 
 const DEFAULT_AUTHOR = "admin";
 
@@ -31,6 +42,17 @@ const FullscreenModal = styled(Modal)`
   }
 `;
 
+const ImageBox = styled.div<{ src: string }>`
+  background-color: #616161;
+  background-image: url(${(props) => props.src});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 5px;
+  padding-top: 56.25%;
+  width: 100%;
+`;
+
 type Props = {
   add?: (value: { files: MediaFile[] }) => void;
   update?: (value: MediaFile) => void;
@@ -50,8 +72,29 @@ const MediaDialog: FC<Props> = ({
   method,
   status,
 }) => {
-  const isShow = method !== undefined;
-  const title = method === "add" ? "Add new media" : "Edit media";
+  let title = "";
+  let contentWidth = 620;
+  let saveBtnLabel = "";
+
+  switch (method) {
+    case "add":
+      title = "Add new media";
+      contentWidth = 620;
+      saveBtnLabel = "Save";
+      break;
+
+    case "edit":
+      title = "Edit media";
+      contentWidth = 1024;
+      saveBtnLabel = "Save";
+      break;
+  }
+
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    setShow(!!method);
+  }, [method]);
 
   let initialValues: { files: MediaFile[] } = { files: [] };
 
@@ -59,8 +102,8 @@ const MediaDialog: FC<Props> = ({
     initialValues = {
       files: map(files, (file) => ({
         author: DEFAULT_AUTHOR,
+        blob: file,
         extension: file.name.substr(file.name.lastIndexOf(".") + 1),
-        file,
         name: file.name.substr(0, file.name.lastIndexOf(".")),
         size: file.size,
       })),
@@ -88,19 +131,19 @@ const MediaDialog: FC<Props> = ({
     let files = [...formik.values.files];
     files.splice(index, 1);
     formik.setFieldValue("files", files, true);
+
+    if (files.length === 0) {
+      setShow(false);
+    }
   };
 
   const renderSubmitButton = () => {
-    let btnText = "";
+    let btnText = saveBtnLabel;
     let disabled = false;
 
     if (status?.add.loading || status?.update.loading) {
       btnText = "Submitting....";
       disabled = true;
-    } else if (method === "add") {
-      btnText = "Save";
-    } else if (method === "edit") {
-      btnText = "Save";
     }
 
     return (
@@ -115,19 +158,20 @@ const MediaDialog: FC<Props> = ({
     );
   };
 
-  const renderFileDetail = (index: number, src: string) => {
+  const renderPreAddFileDetail = (file: MediaFile, index: number) => {
     const handleChange = formik.handleChange;
     const handleBlur = formik.handleBlur;
-    const values = (formik.values.files || [])[index];
-    const errors = (formik.errors.files || [])[index];
+    const src = URL.createObjectURL(file.blob);
+    const uploadFileSize = fileSize(file.size, {
+      round: 0,
+    });
+
+    const errors = formik.errors.files?.[index];
     const errorMessage = map(errors, (error: string) => (
       <div key={error}>{error}</div>
     ));
 
     const feedbackDisplay = errorMessage ? "block" : undefined;
-    const uploadFileSize = fileSize(formik.values.files[index].size, {
-      round: 0,
-    });
 
     return (
       <Row key={index} className="py-3 border-bottom">
@@ -144,7 +188,7 @@ const MediaDialog: FC<Props> = ({
               onChange={handleChange}
               onBlur={handleBlur}
               size="sm"
-              value={values.name}
+              value={file.name}
             />
           </Form.Group>
           <Form.Group>
@@ -156,7 +200,7 @@ const MediaDialog: FC<Props> = ({
               onChange={handleChange}
               onBlur={handleBlur}
               size="sm"
-              value={values.author}
+              value={file.author}
             />
           </Form.Group>
           <div className="d-flex align-items-center justify-content-between">
@@ -176,11 +220,125 @@ const MediaDialog: FC<Props> = ({
     );
   };
 
-  const renderFileList = () => {
-    return formik.values.files.map(({ file }, index) => {
-      const fileSrc = URL.createObjectURL(file);
-      return renderFileDetail(index, fileSrc);
+  const renderPreAddFileList = () => {
+    return formik.values.files.map((file, index) => {
+      return renderPreAddFileDetail(file, index);
     });
+  };
+
+  const renderFileDetail = () => {
+    const file = formik.values.files[0];
+    if (!file) return null;
+
+    const handleChange = formik.handleChange;
+    const handleBlur = formik.handleBlur;
+    const { author, extension, id, name, size, uploadTime } = file;
+    const src = `${MEDIA.mediaManagement.path}/${id}.${extension}`;
+    const uploadFileSize = fileSize(size, { round: 0 });
+    const uploadDate = uploadTime
+      ? new Date(uploadTime).toLocaleDateString()
+      : "";
+
+    const errors = formik.errors.files?.[0];
+    const errorMessage = map(errors, (error: string) => (
+      <div key={error}>{error}</div>
+    ));
+
+    const feedbackDisplay = errorMessage ? "block" : undefined;
+
+    return (
+      <div>
+        <ImageBox className="mb-3" src={src} />
+        <div className="d-flex justify-content-between" style={{ gap: "1rem" }}>
+          <InputGroup size="sm">
+            <InputGroup.Prepend>
+              <InputGroup.Text>Name</InputGroup.Text>
+            </InputGroup.Prepend>
+            <Form.Control
+              name={`files[0].name`}
+              type="text"
+              isInvalid={isObject(errors) && has(errors, "name")}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              size="sm"
+              value={name}
+            />
+            <InputGroup.Append>
+              <InputGroup.Text>{extension}</InputGroup.Text>
+            </InputGroup.Append>
+          </InputGroup>
+
+          <InputGroup size="sm">
+            <InputGroup.Prepend>
+              <InputGroup.Text>
+                <FontAwesomeIcon
+                  className="mr-1"
+                  fixedWidth
+                  icon="user"
+                  size="xs"
+                />
+                Author
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <Form.Control
+              name={`files[0].author`}
+              type="text"
+              isInvalid={isObject(errors) && has(errors, "author")}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={author}
+            />
+          </InputGroup>
+
+          <InputGroup size="sm" style={{ maxWidth: "fit-content" }}>
+            <InputGroup.Prepend>
+              <InputGroup.Text>
+                <FontAwesomeIcon
+                  className="mr-1"
+                  fixedWidth
+                  icon="database"
+                  size="xs"
+                />
+                Size
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <InputGroup.Append>
+              <InputGroup.Text>{uploadFileSize}</InputGroup.Text>
+            </InputGroup.Append>
+          </InputGroup>
+
+          <InputGroup size="sm" style={{ maxWidth: "fit-content" }}>
+            <InputGroup.Prepend>
+              <InputGroup.Text>
+                <FontAwesomeIcon
+                  className="mr-1"
+                  fixedWidth
+                  icon={["far", "calendar-alt"]}
+                  size="xs"
+                />
+                Upload Date
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <InputGroup.Append>
+              <InputGroup.Text>{uploadDate}</InputGroup.Text>
+            </InputGroup.Append>
+          </InputGroup>
+        </div>
+        <Form.Control.Feedback
+          type="invalid"
+          style={{ display: feedbackDisplay }}
+        >
+          {errorMessage}
+        </Form.Control.Feedback>
+      </div>
+    );
+  };
+
+  const renderBody = () => {
+    if (method === "add") return renderPreAddFileList();
+    if (method === "edit") return renderFileDetail();
+
+    return null;
   };
 
   return (
@@ -188,9 +346,9 @@ const MediaDialog: FC<Props> = ({
       animation={false}
       backdrop="static"
       centered
-      contentwidth="620px"
+      contentwidth={`${contentWidth}px`}
       onHide={onHideHandler}
-      show={isShow}
+      show={show}
     >
       <Form
         className="min-vh-100 d-flex flex-column"
@@ -199,7 +357,7 @@ const MediaDialog: FC<Props> = ({
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{renderFileList()}</Modal.Body>
+        <Modal.Body>{renderBody()}</Modal.Body>
         <Modal.Footer>
           <Button
             onClick={onHideHandler}
