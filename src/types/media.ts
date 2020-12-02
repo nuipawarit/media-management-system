@@ -8,8 +8,8 @@ export interface MediaCriteria extends PaginateCriteria {
 
 export type MediaFile = {
   author: string;
+  blob?: File;
   extension: string;
-  file?: File;
   id?: string;
   name: string;
   size: number;
