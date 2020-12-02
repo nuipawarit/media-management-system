@@ -33,7 +33,7 @@ router.get("/media", (req: Request, res: Response) => {
   const page = +(req.query.page || 1);
 
   const data = db.get("media").value();
-  const ordered = orderBy(data, "uploadTime", "asc");
+  const ordered = orderBy(data, "uploadTime", "desc");
   const result = paginate(ordered, count, page);
   const last = isLatest(ordered, count, page);
 
@@ -109,11 +109,9 @@ router.post("/media", (req: Request, res: Response) => {
   if (!isArray(bodyData)) throw new Error("Unexpected input");
 
   const result = bodyData.map(
-    (
-      { author, extension, name, size, uploadTime }: MediaFile,
-      index: number
-    ) => {
+    ({ author, extension, name, size }: MediaFile, index: number) => {
       const mediaId = getRandomId();
+      const uploadTime = +new Date();
       const filePath = `${mediaPath}/${mediaId}.${extension}`;
       const thumbnail = `${mediaId}-thumb.jpg`;
       const thumbnail1Path = `${mediaPath}/${thumbnail}`;

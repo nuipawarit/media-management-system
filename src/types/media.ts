@@ -14,7 +14,7 @@ export type MediaFile = {
   name: string;
   size: number;
   thumbnail?: string;
-  uploadTime: number;
+  uploadTime?: number;
 };
 
 export interface MediaState extends CommonState {

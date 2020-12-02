@@ -63,7 +63,6 @@ const MediaDialog: FC<Props> = ({
         file,
         name: file.name.substr(0, file.name.lastIndexOf(".")),
         size: file.size,
-        uploadTime: file.lastModified,
       })),
     };
   } else if (files) {

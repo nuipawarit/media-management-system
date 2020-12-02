@@ -37,7 +37,7 @@ const Card: FC<Props> = ({
   ...restProps
 }) => {
   const imageSrc = `${MEDIA.mediaManagement.path}/${thumbnail}`;
-  const uploadDate = shortDateFormat(uploadTime);
+  const uploadDate = uploadTime ? shortDateFormat(uploadTime) : "";
   const uploadFileSize = fileSize(size, { round: 0 });
 
   return (

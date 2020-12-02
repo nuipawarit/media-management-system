@@ -20,7 +20,7 @@ export default Yup.object({
         .required("Size is required")
         .max(52428800, "File size must be less than 50 Mb"),
       thumbnail: Yup.string(),
-      uploadTime: Yup.number().required("Upload time is required"),
+      uploadTime: Yup.number(),
     })
   ),
 });
