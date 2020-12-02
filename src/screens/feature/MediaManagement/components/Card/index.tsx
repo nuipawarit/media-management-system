@@ -50,18 +50,19 @@ const Detail = styled.div`
 
 type Props = ComponentProps<typeof BsCard> & {
   data: MediaFile;
+  onClick?: (data: MediaFile) => void;
 };
 
-const Card: FC<Props> = ({
-  data: { author, extension, name, size, thumbnail, uploadTime },
-  ...restProps
-}) => {
+const Card: FC<Props> = ({ data, onClick = () => {}, ...restProps }) => {
+  const { author, extension, name, size, thumbnail, uploadTime } = data;
   const imageSrc = `${MEDIA.mediaManagement.path}/${thumbnail}`;
   const uploadDate = uploadTime ? shortDateFormat(uploadTime) : "";
   const uploadFileSize = fileSize(size, { round: 0 });
 
+  const onClickHandler = () => onClick(data);
+
   return (
-    <Box {...restProps}>
+    <Box {...restProps} onClick={onClickHandler}>
       <Image variant="top" src={imageSrc} />
       <Body>
         <FontAwesomeIcon
