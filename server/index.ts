@@ -60,7 +60,7 @@ router.get("/media/mocks", (req: Request, res: Response) => {
       const name = `mock-${mediaId}`;
       const size = image.data.length;
       const uploadTime = +new Date();
-      const filePath = `${mediaPath}/${name}.${extension}`;
+      const filePath = `${mediaPath}/${mediaId}.${extension}`;
       const thumbnail = `${name}-thumb.jpg`;
       const thumbnail1Path = `${mediaPath}/${thumbnail}`;
 
@@ -116,7 +116,7 @@ router.post("/media", (req: Request, res: Response) => {
       const thumbnail = `${mediaId}-thumb.jpg`;
       const thumbnail1Path = `${mediaPath}/${thumbnail}`;
 
-      const file = req.files?.[`files[${index}][file]`];
+      const file = req.files?.[`files[${index}][blob]`];
 
       if (!file) throw new Error("Unexpected files payload");
 
