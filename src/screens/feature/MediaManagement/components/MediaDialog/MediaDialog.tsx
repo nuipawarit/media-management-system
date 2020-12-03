@@ -7,6 +7,7 @@ import {
   Image,
   InputGroup,
   Modal,
+  ResponsiveEmbed,
   Row,
 } from "react-bootstrap";
 
@@ -41,15 +42,13 @@ const FullscreenModal = styled(Modal)`
   }
 `;
 
-const ImageBox = styled.div<{ src: string }>`
+const MediaWrapper = styled(ResponsiveEmbed)`
   background-color: #616161;
-  background-image: url(${(props) => props.src});
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
   border-radius: 5px;
-  padding-top: 56.25%;
-  width: 100%;
+
+  > * {
+    object-fit: contain;
+  }
 `;
 
 type Props = {
@@ -206,11 +205,15 @@ const MediaDialog: FC<Props> = ({
 
     const feedbackDisplay = errorMessage ? "block" : undefined;
 
+    const thumbnail = ["mp4"].includes(file.extension) ? (
+      <video className="w-100 border" src={src} />
+    ) : (
+      <Image src={src} thumbnail />
+    );
+
     return (
       <Row key={index} className="py-3 border-bottom">
-        <Col>
-          <Image src={src} thumbnail />
-        </Col>
+        <Col>{thumbnail}</Col>
         <Col>
           <Form.Group>
             <Form.Label className="small">Name:</Form.Label>
@@ -269,7 +272,6 @@ const MediaDialog: FC<Props> = ({
     const handleChange = formik.handleChange;
     const handleBlur = formik.handleBlur;
     const { author, extension, id, name, size, uploadTime } = file;
-    const src = `${MEDIA.mediaManagement.path}/${id}.${extension}`;
     const uploadFileSize = fileSize(size, { round: 0 });
     const uploadDate = uploadTime
       ? new Date(uploadTime).toLocaleDateString()
@@ -279,12 +281,20 @@ const MediaDialog: FC<Props> = ({
     const errorMessage = map(errors, (error: string) => (
       <div key={error}>{error}</div>
     ));
-
     const feedbackDisplay = errorMessage ? "block" : undefined;
+
+    const src = `${MEDIA.mediaManagement.path}/${id}.${extension}`;
+    const media = ["mp4"].includes(file.extension) ? (
+      <video src={src} controls />
+    ) : (
+      <Image src={src} />
+    );
 
     return (
       <div>
-        <ImageBox className="mb-3" src={src} />
+        <MediaWrapper aspectRatio="16by9" className="mb-3">
+          {media}
+        </MediaWrapper>
         <div className="d-flex justify-content-between" style={{ gap: "1rem" }}>
           <InputGroup size="sm">
             <InputGroup.Prepend>
