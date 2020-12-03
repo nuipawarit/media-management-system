@@ -12,21 +12,17 @@ const mapState = () => (state: RootState) => {
   const selectMedia = makeSelectMedia();
 
   const {
-    data: {
-      criteria: { page },
-      hasMore,
-      result,
-    },
+    data: { criteria, hasMore, result },
     status: {
       get: { loading },
     },
   } = selectMedia(state);
 
   return {
+    criteria,
     data: result,
     hasMore,
     loading,
-    page,
   };
 };
 

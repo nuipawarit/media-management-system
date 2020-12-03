@@ -8,7 +8,7 @@ import Button from "components/common/base/Button";
 import { Body, Document, Head } from "components/common/base/Page";
 import SearchInput from "components/common/base/SearchInput";
 import ToggleableButton from "components/common/base/ToggleableButton";
-import { MediaFile } from "types/media";
+import { MediaCriteria, MediaFile } from "types/media";
 
 import AddMediaButton from "./components/AddMediaButton";
 import Card from "./components/Card";
@@ -17,23 +17,25 @@ import MediaDialog from "./components/MediaDialog";
 
 type Props = {
   clearResult: () => void;
+  criteria: MediaCriteria;
   data: MediaFile[] | null;
   hasMore: boolean;
-  load: (criteria: { page: number }) => void;
+  load: (criteria: Partial<MediaCriteria>) => void;
   loading: boolean;
-  page: number;
   reset: () => void;
 };
 
 const MediaManagement: FC<Props> = ({
   clearResult,
+  criteria,
   data,
   hasMore,
   load,
   loading,
-  page,
   reset,
 }) => {
+  const { fileType, uploadTime, name, page } = criteria;
+
   const [isInitialedList, setIsInitialedList] = useState(false);
   const [mediaDialogState, setMediaDialogState] = useState<{
     method?: "add" | "edit";
@@ -48,7 +50,7 @@ const MediaManagement: FC<Props> = ({
     return () => {
       reset();
     };
-  }, [clearResult, load, reset]);
+  }, [clearResult, reset]);
 
   const loadMore = () => {
     if (loading || !hasMore) return;
@@ -69,6 +71,14 @@ const MediaManagement: FC<Props> = ({
     setMediaDialogState({ show: false });
   };
 
+  const fileTypeButtonClickHandler = (type: string, status: boolean) => {
+    clearResult();
+    load({
+      fileType: { ...criteria.fileType, [type]: status },
+      page: 1,
+    });
+  };
+
   return (
     <Document>
       <Head title="Media Management System" />
@@ -76,10 +86,19 @@ const MediaManagement: FC<Props> = ({
         <div className="container d-flex h-100 flex-column">
           <h1 className="display-4 pt-4 pb-3">Media Management</h1>
           <div className="d-flex mb-3">
-            <ToggleableButton active={false}>
+            <ToggleableButton
+              active={fileType?.image}
+              name="image"
+              onClick={fileTypeButtonClickHandler}
+            >
               <FontAwesomeIcon icon={["fas", "image"]} fixedWidth /> Image
             </ToggleableButton>
-            <ToggleableButton active={false} className="ml-2">
+            <ToggleableButton
+              active={fileType?.video}
+              className="ml-2"
+              name="video"
+              onClick={fileTypeButtonClickHandler}
+            >
               <FontAwesomeIcon icon={["fas", "video"]} fixedWidth /> Video
             </ToggleableButton>
             <DateRangePicker>
