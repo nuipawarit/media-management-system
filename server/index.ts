@@ -171,9 +171,23 @@ router.put("/media/:id", (req: Request, res: Response) => {
 });
 
 router.delete("/media/:id", (req: Request, res: Response) => {
-  // const deleteIndex = books.findIndex((book) => book.id === req.params.id);
-  // books.splice(deleteIndex, 1);
-  res.status(204).send();
+  const id = req.params.id;
+
+  const { extension, thumbnail } = db.get("media").find({ id }).value();
+
+  const filePath = `${mediaPath}/${id}.${extension}`;
+  const thumbnail1Path = `${mediaPath}/${thumbnail}`;
+
+  // Remove file on server storage
+  fs.unlinkSync(filePath);
+  fs.unlinkSync(thumbnail1Path);
+
+  // Save file data to database
+  db.get("media").remove({ id }).write();
+
+  const result = { id };
+
+  res.status(200).json({ result });
 });
 
 app.use("/api/v1", router);
