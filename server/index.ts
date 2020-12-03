@@ -161,8 +161,13 @@ router.post("/media", async (req: Request, res: Response) => {
 });
 
 router.put("/media/:id", (req: Request, res: Response) => {
-  // const updateIndex = books.findIndex((book) => book.id === req.params.id);
-  // res.json(Object.assign(books[updateIndex], req.body));
+  const id = req.params.id;
+  const newData = req.body;
+
+  // Save file data to database
+  const result = db.get("media").find({ id }).assign(newData).write();
+
+  res.status(200).json({ result });
 });
 
 router.delete("/media/:id", (req: Request, res: Response) => {
