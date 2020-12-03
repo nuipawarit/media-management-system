@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Application, Request, Response, Router } from "express";
 import fileUpload from "express-fileupload";
-import { isArray, orderBy } from "lodash";
+import { inRange, isArray, isObjectLike, isString, orderBy } from "lodash";
 import qs from "qs";
 
 import db from "./helper/database";
@@ -31,8 +31,45 @@ app.use("/static/media", express.static(mediaPath));
 router.get("/media", (req: Request, res: Response) => {
   const count = +(req.query.count || 20);
   const page = +(req.query.page || 1);
+  const fileType: any = req.query.fileType;
+  const uploadTime: any = req.query.uploadTime;
+  const name = req.query.name || "";
 
-  const data = db.get("media").value();
+  let allowedExt: string[] = [];
+
+  if (isObjectLike(fileType)) {
+    if (fileType.image === "true") {
+      allowedExt = [...allowedExt, "jpg", "jpeg", "png"];
+    }
+
+    if (fileType.video === "true") {
+      allowedExt = [...allowedExt, "mp4"];
+    }
+  }
+
+  const filter = (media: MediaFile) => {
+    if (allowedExt.length > 0 && !allowedExt.includes(media.extension))
+      return false;
+
+    if (isObjectLike(uploadTime) && uploadTime.from && uploadTime.to) {
+      const { from, to } = uploadTime;
+
+      if (!inRange(media.uploadTime, from, to)) {
+        return false;
+      }
+    }
+
+    if (
+      isString(name) &&
+      name.trim().length > 0 &&
+      !media.name.toLocaleLowerCase().includes(name.trim().toLocaleLowerCase())
+    )
+      return false;
+
+    return true;
+  };
+
+  const data = db.get("media").filter(filter).value();
   const ordered = orderBy(data, "uploadTime", "desc");
   const result = paginate(ordered, count, page);
   const last = isLatest(ordered, count, page);
