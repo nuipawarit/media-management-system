@@ -1,6 +1,7 @@
 import React, { ComponentProps, FC } from "react";
 import { Card as BsCard } from "react-bootstrap";
 
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import fileSize from "filesize";
 import styled from "styled-components";
@@ -49,6 +50,10 @@ const Card: FC<Props> = ({ data, onClick = () => {}, ...restProps }) => {
   const uploadDate = uploadTime ? shortDateFormat(uploadTime) : "";
   const uploadFileSize = fileSize(size, { round: 0 });
 
+  const icon: IconProp = ["mp4"].includes(extension)
+    ? ["far", "video"]
+    : ["far", "image"];
+
   const onClickHandler = () => onClick(data);
 
   return (
@@ -57,7 +62,7 @@ const Card: FC<Props> = ({ data, onClick = () => {}, ...restProps }) => {
       <Body>
         <FontAwesomeIcon
           className="pt-1 mr-1"
-          icon={["far", "image"]}
+          icon={icon}
           fixedWidth
           size="lg"
         />
