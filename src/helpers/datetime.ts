@@ -3,3 +3,6 @@ export const shortDateFormat = (value: string | number | Date) =>
     day: "numeric",
     month: "short",
   });
+
+export const localDateFormat = (value: string | number | Date) =>
+  new Date(value).toLocaleDateString();

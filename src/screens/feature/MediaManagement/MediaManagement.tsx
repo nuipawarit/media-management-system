@@ -4,11 +4,13 @@ import InfiniteScroll from "react-infinite-scroller";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { debounce } from "lodash";
+import { Moment } from "moment";
 
 import Button from "components/common/base/Button";
 import { Body, Document, Head } from "components/common/base/Page";
 import SearchInput from "components/common/base/SearchInput";
 import ToggleableButton from "components/common/base/ToggleableButton";
+import { localDateFormat } from "helpers/datetime";
 import { MediaCriteria, MediaFile } from "types/media";
 
 import AddMediaButton from "./components/AddMediaButton";
@@ -80,6 +82,14 @@ const MediaManagement: FC<Props> = ({
     });
   };
 
+  const uploadTimeChangeHandler = (from: Moment, to: Moment) => {
+    clearResult();
+    load({
+      uploadTime: { from: +from, to: +to },
+      page: 1,
+    });
+  };
+
   const debouncedNameSearch = debounce((value: string) => {
     clearResult();
     load({
@@ -90,6 +100,16 @@ const MediaManagement: FC<Props> = ({
 
   const nameSearchInputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     debouncedNameSearch(e.target.value);
+  };
+
+  const getDateRangePickerLabel = () => {
+    if (uploadTime) {
+      return `${localDateFormat(uploadTime.from)} - ${localDateFormat(
+        uploadTime.to
+      )}`;
+    }
+
+    return "Upload Date/Time";
   };
 
   return (
@@ -114,10 +134,10 @@ const MediaManagement: FC<Props> = ({
             >
               <FontAwesomeIcon icon={["fas", "video"]} fixedWidth /> Video
             </ToggleableButton>
-            <DateRangePicker>
+            <DateRangePicker onCallback={uploadTimeChangeHandler}>
               <Button variant="light" className="ml-2">
                 <FontAwesomeIcon icon={["far", "calendar-alt"]} fixedWidth />{" "}
-                Upload Date/Time
+                {getDateRangePickerLabel()}
               </Button>
             </DateRangePicker>
             <SearchInput
