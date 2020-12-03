@@ -45,7 +45,7 @@ export function* get(action: { payload?: Partial<MediaCriteria> }) {
   }
 }
 
-export function* add(action: { payload: { files: MediaFile[] } }) {
+export function* add(action: { payload: MediaFile[] }) {
   try {
     const state: MediaState = yield select(selectSlice);
 
@@ -56,7 +56,7 @@ export function* add(action: { payload: { files: MediaFile[] } }) {
     // Create new media
     const serviceResponse = yield call(mediaService.add, action.payload);
 
-    const serviceResult = serviceResponse.data.results.data;
+    const serviceResult = serviceResponse.data.result;
     const result = [...serviceResult, ...state.data.result];
 
     const data = {
@@ -86,11 +86,11 @@ export function* update(action: { payload: MediaFile }) {
       mediaId,
       action.payload
     );
-    const serviceResult = serviceResponse.data.results.data;
+    const serviceResult = serviceResponse.data.result;
 
     const result = state.data.result.map((item) => {
-      if (item.id === serviceResult[0].id) {
-        return serviceResult[0];
+      if (item.id === serviceResult.id) {
+        return serviceResult;
       }
 
       return item;
@@ -103,6 +103,7 @@ export function* update(action: { payload: MediaFile }) {
 
     yield put(actions.updateSucceeded(data));
   } catch (error) {
+    console.log(error);
     yield put(actions.updateFailed(error));
   }
 }
@@ -119,7 +120,7 @@ export function* remove(action: { payload: MediaFile }) {
 
     // Update media
     const serviceResponse = yield call(mediaService.remove, mediaId);
-    const serviceResult = serviceResponse.data.results.data;
+    const serviceResult = serviceResponse.data.result;
 
     const result = state.data.result.filter((item) => {
       return item.id !== serviceResult.id;

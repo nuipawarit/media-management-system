@@ -17,9 +17,9 @@ export const get = (params: { count?: number; name?: string; page?: number }) =>
     url: API_CONFIG.services.mediaManagement.endpoints.media,
   });
 
-export const add = (data: { files: MediaFile[] }) => {
-  const formData = serialize(data, { indices: true });
-  
+export const add = (data: MediaFile[]) => {
+  const formData = serialize({ data }, { indices: true });
+
   return request<MediaFile[]>({
     baseURL: API_CONFIG.services.mediaManagement.host,
     data: formData,
