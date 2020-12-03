@@ -34,6 +34,7 @@ const Box = styled(BsCard)`
 `;
 
 const Image = styled(BsCard.Img)`
+  object-fit: cover;
   height: 6.75rem;
   width: 12rem;
 `;
