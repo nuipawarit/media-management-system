@@ -38,7 +38,8 @@ const MediaManagement: FC<Props> = ({
   const [mediaDialogState, setMediaDialogState] = useState<{
     method?: "add" | "edit";
     files?: FileList | MediaFile;
-  }>({});
+    show: boolean;
+  }>({ show: false });
 
   useEffect(() => {
     setIsInitialedList(true);
@@ -56,15 +57,16 @@ const MediaManagement: FC<Props> = ({
   };
 
   const onClickCardHandler = (files: MediaFile) => {
-    setMediaDialogState({ method: "edit", files });
+    setMediaDialogState({ method: "edit", files, show: true });
   };
 
   const onFileChangeHandler = (files: FileList) => {
-    if (files.length > 0) setMediaDialogState({ method: "add", files });
+    if (files.length > 0)
+      setMediaDialogState({ method: "add", files, show: true });
   };
 
   const onHildeMediaDialogHandler = () => {
-    setMediaDialogState({});
+    setMediaDialogState({ show: false });
   };
 
   return (
@@ -91,7 +93,10 @@ const MediaManagement: FC<Props> = ({
               placeholder="Search by media name"
             />
           </div>
-          <div className="flex-fill overflow-auto">
+          <div
+            className="flex-fill"
+            style={{ overflowX: "hidden", overflowY: "auto" }}
+          >
             <InfiniteScroll
               className="d-flex flex-wrap justify-content-between"
               hasMore={hasMore}
@@ -119,6 +124,7 @@ const MediaManagement: FC<Props> = ({
             files={mediaDialogState.files}
             method={mediaDialogState.method}
             onHide={onHildeMediaDialogHandler}
+            show={mediaDialogState.show}
           />
         </div>
       </Body>

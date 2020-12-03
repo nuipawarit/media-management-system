@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch, bindActionCreators } from "@reduxjs/toolkit";
 
 import { makeSelectMedia } from "state/data/media/selectors";
-import { add, update } from "state/data/media/slice";
+import { add, remove, update } from "state/data/media/slice";
 import type RootState from "types/rootState";
 
 import View from "./MediaDialog";
@@ -19,6 +19,7 @@ const mapDispatch = (dispatch: Dispatch) => ({
   ...bindActionCreators(
     {
       add,
+      remove,
       update,
     },
     dispatch

@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { FC, useEffect } from "react";
 import {
   Button,
   Col,
@@ -12,15 +13,13 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import fileSize from "filesize";
 import { useFormik } from "formik";
-import { has, isObject, map } from "lodash";
+import { has, isObject, map, some } from "lodash";
 import styled from "styled-components";
 
+import MEDIA from "config/app/media";
 import fileSchema from "schemas/files";
 import { MediaFile } from "types/media";
 import { CommonAsyncState } from "types/state";
-
-import MEDIA from "../../../../../config/app/media";
-import { shortDateFormat } from "../../../../../helpers/datetime";
 
 const DEFAULT_AUTHOR = "admin";
 
@@ -54,22 +53,28 @@ const ImageBox = styled.div<{ src: string }>`
 `;
 
 type Props = {
-  add?: (value: { files: MediaFile[] }) => void;
+  add?: (value: MediaFile[]) => void;
   update?: (value: MediaFile) => void;
   files?: FileList | MediaFile;
   onHide: () => void;
   method?: "add" | "edit";
+  remove?: (value: MediaFile) => void;
+  show: boolean;
   status?: {
     add: CommonAsyncState;
     update: CommonAsyncState;
+    remove: CommonAsyncState;
   };
 };
 
 const MediaDialog: FC<Props> = ({
   add = () => {},
+  update = () => {},
   files,
   onHide,
   method,
+  remove = () => {},
+  show,
   status,
 }) => {
   let title = "";
@@ -90,11 +95,9 @@ const MediaDialog: FC<Props> = ({
       break;
   }
 
-  const [show, setShow] = useState(false);
-
   useEffect(() => {
-    setShow(!!method);
-  }, [method]);
+    if (some(status, (type) => type.loaded)) onHide();
+  }, [status]);
 
   let initialValues: { files: MediaFile[] } = { files: [] };
 
@@ -117,9 +120,9 @@ const MediaDialog: FC<Props> = ({
     initialValues,
     onSubmit: (value) => {
       if (method === "add") {
-        add(value);
+        add(value.files);
       } else if (method === "edit") {
-        // update(value);
+        update(value.files[0]);
       }
     },
     validationSchema: fileSchema,
@@ -127,23 +130,53 @@ const MediaDialog: FC<Props> = ({
 
   const onHideHandler = () => onHide();
 
-  const onRemoveClickHandler = (index: number) => {
+  const onRemovePreAddFileClickHandler = (index: number) => {
     let files = [...formik.values.files];
     files.splice(index, 1);
     formik.setFieldValue("files", files, true);
 
     if (files.length === 0) {
-      setShow(false);
+      onHide();
     }
+  };
+
+  const onRemoveBtnClickHandler = () => {
+    remove(formik.values.files[0]);
+  };
+
+  const renderDeleteButton = () => {
+    if (method !== "edit") return null;
+
+    let disabled = false;
+
+    if (some(status, (type) => type.loading)) {
+      disabled = true;
+    }
+
+    return (
+      <Button
+        className="mr-auto"
+        disabled={disabled}
+        onClick={onRemoveBtnClickHandler}
+        style={{ minWidth: "100px" }}
+        type="button"
+        variant="outline-danger"
+      >
+        Delete
+      </Button>
+    );
   };
 
   const renderSubmitButton = () => {
     let btnText = saveBtnLabel;
     let disabled = false;
 
+    if (some(status, (type) => type.loading)) {
+      disabled = true;
+    }
+
     if (status?.add.loading || status?.update.loading) {
       btnText = "Submitting....";
-      disabled = true;
     }
 
     return (
@@ -205,7 +238,10 @@ const MediaDialog: FC<Props> = ({
           </Form.Group>
           <div className="d-flex align-items-center justify-content-between">
             <span className="small text-muted">Size: {uploadFileSize}</span>
-            <Button variant="link" onClick={() => onRemoveClickHandler(index)}>
+            <Button
+              variant="link"
+              onClick={() => onRemovePreAddFileClickHandler(index)}
+            >
               <FontAwesomeIcon icon={["far", "trash-alt"]} />
             </Button>
           </div>
@@ -359,6 +395,7 @@ const MediaDialog: FC<Props> = ({
         </Modal.Header>
         <Modal.Body>{renderBody()}</Modal.Body>
         <Modal.Footer>
+          {renderDeleteButton()}
           <Button
             onClick={onHideHandler}
             type="button"
