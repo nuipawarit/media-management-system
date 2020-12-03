@@ -10,26 +10,15 @@ import { shortDateFormat } from "helpers/datetime";
 import { MediaFile } from "types/media";
 
 const Box = styled(BsCard)`
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   position: relative;
-  translation: box-shadow 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
   width: calc(12rem + 2px);
 
-  ::before {
-    bottom: 0;
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
-    content: "";
-    left: 0;
-    opacity: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: opacity 0.2s;
-  }
-
-  :hover::before {
+  :hover {
     cursor: pointer;
-    opacity: 1;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    transform: scale(1.02, 1.02);
   }
 `;
 
