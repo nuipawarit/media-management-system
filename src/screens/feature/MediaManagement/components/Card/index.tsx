@@ -51,7 +51,7 @@ const Card: FC<Props> = ({ data, onClick = () => {}, ...restProps }) => {
   const uploadFileSize = fileSize(size, { round: 0 });
 
   const icon: IconProp = ["mp4"].includes(extension)
-    ? ["far", "video"]
+    ? ["fas", "video"]
     : ["far", "image"];
 
   const onClickHandler = () => onClick(data);
