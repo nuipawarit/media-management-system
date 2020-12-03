@@ -1,8 +1,9 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { ChangeEvent, FC, useEffect, useState } from "react";
 import DateRangePicker from "react-bootstrap-daterangepicker";
 import InfiniteScroll from "react-infinite-scroller";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { debounce } from "lodash";
 
 import Button from "components/common/base/Button";
 import { Body, Document, Head } from "components/common/base/Page";
@@ -79,6 +80,18 @@ const MediaManagement: FC<Props> = ({
     });
   };
 
+  const debouncedNameSearch = debounce((value: string) => {
+    clearResult();
+    load({
+      name: value,
+      page: 1,
+    });
+  }, 300);
+
+  const nameSearchInputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    debouncedNameSearch(e.target.value);
+  };
+
   return (
     <Document>
       <Head title="Media Management System" />
@@ -109,6 +122,7 @@ const MediaManagement: FC<Props> = ({
             </DateRangePicker>
             <SearchInput
               className="d-block w-auto ml-auto has-search"
+              onChange={nameSearchInputChangeHandler}
               placeholder="Search by media name"
             />
           </div>
@@ -117,7 +131,7 @@ const MediaManagement: FC<Props> = ({
             style={{ overflowX: "hidden", overflowY: "auto" }}
           >
             <InfiniteScroll
-              className="d-flex flex-wrap justify-content-between"
+              className="d-flex flex-wrap mr-n4"
               hasMore={hasMore}
               initialLoad={!isInitialedList}
               loader={
@@ -131,7 +145,7 @@ const MediaManagement: FC<Props> = ({
               {(data ?? []).map((mediaFile) => (
                 <Card
                   key={mediaFile.id}
-                  className="mb-3"
+                  className="mr-4 mb-3"
                   data={mediaFile}
                   onClick={onClickCardHandler}
                 />
