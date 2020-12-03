@@ -3,6 +3,14 @@ import { CommonAsyncState, CommonState } from "types/state";
 import { PaginateCriteria } from "./criteria";
 
 export interface MediaCriteria extends PaginateCriteria {
+  fileType?: {
+    image?: boolean;
+    video?: boolean;
+  };
+  uploadTime?: {
+    from: number;
+    to: number;
+  };
   name?: string;
 }
 

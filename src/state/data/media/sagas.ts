@@ -19,11 +19,7 @@ export function* get(action: { payload?: Partial<MediaCriteria> }) {
       };
     }
 
-    const params = {
-      count: criteria.count,
-      name: criteria.name || undefined,
-      page: criteria.page,
-    };
+    const params = { ...criteria };
 
     yield put(actions.getPending());
 

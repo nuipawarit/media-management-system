@@ -3,17 +3,13 @@ import { serialize } from "object-to-formdata";
 import API_CONFIG from "config/api";
 import request from "helpers/request";
 
-import { MediaFile } from "../../../types/media";
+import { MediaCriteria, MediaFile } from "../../../types/media";
 
-export const get = (params: { count?: number; name?: string; page?: number }) =>
+export const get = (params: MediaCriteria) =>
   request<Response>({
     baseURL: API_CONFIG.services.mediaManagement.host,
     method: "GET",
-    params: {
-      count: params.count,
-      name: params.name,
-      page: params.page,
-    },
+    params,
     url: API_CONFIG.services.mediaManagement.endpoints.media,
   });
 
