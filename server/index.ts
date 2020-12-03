@@ -51,7 +51,7 @@ router.get("/media/mocks", (req: Request, res: Response) => {
   for (let i = 0; i < count; i++) {
     const mediaId = getRandomId();
 
-    imgGen.generateImage(180, 100, 80, function (
+    imgGen.generateImage(180, 100, 80, async function (
       err: any,
       image: { data: any }
     ) {
@@ -68,15 +68,17 @@ router.get("/media/mocks", (req: Request, res: Response) => {
       fs.writeFileSync(filePath, image.data);
 
       // Save thumbnail file using FFmpeg method
-      simpleThumbnail(filePath, thumbnail1Path, "200x?").catch(() => {
-        // Using alternative method on first method is failed
-        nodeThumbnail({
-          destination: mediaPath,
-          source: filePath,
-          suffix: "-thumb",
-          width: 200,
-        });
-      });
+      await simpleThumbnail(filePath, thumbnail1Path, "200x?").catch(
+        async () => {
+          // Using alternative method on first method is failed
+          await nodeThumbnail({
+            destination: mediaPath,
+            source: filePath,
+            suffix: "-thumb",
+            width: 200,
+          });
+        }
+      );
 
       // Save file data to database
       db.get("media")
@@ -98,60 +100,64 @@ router.get("/media/mocks", (req: Request, res: Response) => {
 
 router.get("/media/:id", (req: Request, res: Response) => {
   const id = req.params.id;
-  const data = db.get("media").find({ id }).value();
+  const result = db.get("media").find({ id }).value();
 
-  res.json({ result: data });
+  res.json({ result });
 });
 
-router.post("/media", (req: Request, res: Response) => {
-  const bodyData: any = qs.parse(req.body).files;
+router.post("/media", async (req: Request, res: Response) => {
+  const bodyData: any = qs.parse(req.body).data;
 
   if (!isArray(bodyData)) throw new Error("Unexpected input");
 
-  const result = bodyData.map(
-    ({ author, extension, name, size }: MediaFile, index: number) => {
-      const mediaId = getRandomId();
-      const uploadTime = +new Date();
-      const filePath = `${mediaPath}/${mediaId}.${extension}`;
-      const thumbnail = `${mediaId}-thumb.jpg`;
-      const thumbnail1Path = `${mediaPath}/${thumbnail}`;
+  const result = await Promise.all(
+    bodyData.map(
+      async ({ author, extension, name, size }: MediaFile, index: number) => {
+        const mediaId = getRandomId();
+        const uploadTime = +new Date();
+        const filePath = `${mediaPath}/${mediaId}.${extension}`;
+        const thumbnail = `${mediaId}-thumb.jpg`;
+        const thumbnail1Path = `${mediaPath}/${thumbnail}`;
 
-      const file = req.files?.[`files[${index}][blob]`];
+        const file = req.files?.[`data[${index}][blob]`];
 
-      if (!file) throw new Error("Unexpected files payload");
+        if (!file) throw new Error("Unexpected files payload");
 
-      // Save file to server storage
-      fs.writeFileSync(filePath, file.data);
+        // Save file to server storage
+        fs.writeFileSync(filePath, file.data);
 
-      // Save thumbnail file using FFmpeg method
-      simpleThumbnail(filePath, thumbnail1Path, "200x?").catch(() => {
-        // Using alternative method on first method is failed
-        nodeThumbnail({
-          destination: mediaPath,
-          source: filePath,
-          suffix: "-thumb",
-          width: 200,
-        });
-      });
+        // Save thumbnail file using FFmpeg method
+        await simpleThumbnail(filePath, thumbnail1Path, "200x?").catch(
+          async () => {
+            // Using alternative method on first method is failed
+            await nodeThumbnail({
+              destination: mediaPath,
+              source: filePath,
+              suffix: "-thumb",
+              width: 200,
+            });
+          }
+        );
 
-      const data = {
-        author,
-        extension,
-        id: mediaId,
-        name,
-        size,
-        thumbnail,
-        uploadTime,
-      };
+        const data = {
+          author,
+          extension,
+          id: mediaId,
+          name,
+          size,
+          thumbnail,
+          uploadTime,
+        };
 
-      // Save file data to database
-      db.get("media").push(data).write();
+        // Save file data to database
+        db.get("media").push(data).write();
 
-      return data;
-    }
+        return data;
+      }
+    )
   );
 
-  res.status(201).json(result);
+  res.status(201).json({ result });
 });
 
 router.put("/media/:id", (req: Request, res: Response) => {
