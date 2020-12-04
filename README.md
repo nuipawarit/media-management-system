@@ -1,46 +1,85 @@
-# Getting Started with Create React App
+# Media management system
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![alt text](https://github.com/nuipawarit/media-management-system/blob/master/images/image-1.png?raw=true)
 
-## Available Scripts
+### Features
+* Supports image (jpg, jpeg, png) and video (mp4) media files under 50 MB.
+* Supports file name, upload date and uploader name storage.
+* Automatically generate thumbnail.
+* Can search media by name, type and upload date.
+* Infinite scroll.
 
-In the project directory, you can run:
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+**1.** Install package dependencies:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```sh
+npm install
+```
 
-### `npm test`
+**2.** Install `ffmpeg` on the local machine (for support video thumbnail generator).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+###### For Mac OS
+```sh
+brew install ffmpeg
+```
 
-### `npm run build`
+###### For Linux
+```sh
+sudo apt-get update && apt-get install ffmpeg 
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Starting the application
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**1.** Run the API server by running the following command:
 
-### `npm run eject`
+```sh
+npm start:server:dev
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**2.** Run the development server by running the following command:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```sh
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+**3.** Open [http://localhost:3000](http://localhost:3000) to launch application in the browser.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+> Tip: press `control + c` to stop the development server.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Technology Stack
+* **TypeScript** as main programming language.
+* **React 17.0.1** for build single page application.
+* **Redux** and **Redux-Saga** for state management.
+* **Node.js** with **express** framework for build Media server.
+* [**lowdb**](https://github.com/typicode/lowdb) as database.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Database Schema
+
+```
+{
+  author: string;
+  extension: "jpg" | "jpeg" | "png" | "mp4";
+  id: string;
+  name: string;
+  size: number;
+  thumbnail: string;
+  uploadTime: number;
+}
+```
+
+
+## Browser Support
+
+Because this project uses CSS3 features, it’s only meant for modern browsers. Some browsers currently fail to apply some of the styles correctly.
+
+Chrome and Firefox have full support, but Safari and IE have strange behaviors.
+
+
+## Credits
+
+This project was bootstrapped with [Create React App](https://create-react-app.dev).
