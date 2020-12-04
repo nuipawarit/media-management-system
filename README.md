@@ -1,6 +1,6 @@
 # Media management system
 
-![alt text](https://github.com/nuipawarit/media-management-system/blob/master/images/image-1.png?raw=true)
+![alt text](https://github.com/nuipawarit/media-management-system/blob/main/images/image-1.png?raw=true)
 
 ### Features
 * Supports image (jpg, jpeg, png) and video (mp4) media files under 50 MB.
