@@ -151,7 +151,7 @@ const MediaManagement: FC<Props> = ({
             style={{ overflowX: "hidden", overflowY: "auto" }}
           >
             <InfiniteScroll
-              className="d-flex flex-wrap mr-n4"
+              className="d-flex flex-wrap justify-content-around mx-n1"
               hasMore={hasMore}
               initialLoad={!isInitialedList}
               loader={
@@ -165,7 +165,7 @@ const MediaManagement: FC<Props> = ({
               {(data ?? []).map((mediaFile) => (
                 <Card
                   key={mediaFile.id}
-                  className="mr-4 mb-3"
+                  className="mb-3 mx-1"
                   data={mediaFile}
                   onClick={onClickCardHandler}
                 />
