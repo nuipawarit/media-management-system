@@ -37,7 +37,7 @@ const MediaManagement: FC<Props> = ({
   loading,
   reset,
 }) => {
-  const { fileType, uploadTime, name, page } = criteria;
+  const { fileType, uploadTime, page } = criteria;
 
   const [isInitialedList, setIsInitialedList] = useState(false);
   const [mediaDialogState, setMediaDialogState] = useState<{
@@ -117,8 +117,10 @@ const MediaManagement: FC<Props> = ({
       <Head title="Media Management System" />
       <Body>
         <div className="container d-flex h-100 flex-column">
-          <h1 className="display-4 pt-4 pb-3">Media Management</h1>
-          <div className="d-flex mb-3">
+          <h1 className="display-4 pt-4 pb-3" style={{ fontSize: "calc(2vw + 2rem)" }}>
+            Media Management
+          </h1>
+          <div className="d-flex flex-wrap mb-3" style={{ gap: "0.5rem" }}>
             <ToggleableButton
               active={fileType?.image}
               name="image"
@@ -128,20 +130,19 @@ const MediaManagement: FC<Props> = ({
             </ToggleableButton>
             <ToggleableButton
               active={fileType?.video}
-              className="ml-2"
               name="video"
               onClick={fileTypeButtonClickHandler}
             >
               <FontAwesomeIcon icon={["fas", "video"]} fixedWidth /> Video
             </ToggleableButton>
             <DateRangePicker onCallback={uploadTimeChangeHandler}>
-              <Button variant="light" className="ml-2">
+              <Button className="flex-grow-1 flex-md-grow-0" variant="light">
                 <FontAwesomeIcon icon={["far", "calendar-alt"]} fixedWidth />{" "}
                 {getDateRangePickerLabel()}
               </Button>
             </DateRangePicker>
             <SearchInput
-              className="d-block w-auto ml-auto has-search"
+              className="d-block w-auto flex-grow-1 flex-md-grow-0 ml-auto has-search"
               onChange={nameSearchInputChangeHandler}
               placeholder="Search by media name"
             />

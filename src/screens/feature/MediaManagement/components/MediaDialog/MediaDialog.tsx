@@ -295,7 +295,7 @@ const MediaDialog: FC<Props> = ({
         <MediaWrapper aspectRatio="16by9" className="mb-3">
           {media}
         </MediaWrapper>
-        <div className="d-flex justify-content-between" style={{ gap: "1rem" }}>
+        <div className="d-flex flex-wrap justify-content-between" style={{ gap: "1rem" }}>
           <InputGroup size="sm">
             <InputGroup.Prepend>
               <InputGroup.Text>Name</InputGroup.Text>

@@ -10,7 +10,7 @@ const Box = styled(Button)`
     border-color: #939393 !important;
     color: #f1f1f1 !important;
   }
-  
+
   &.active:hover {
     background-color: #b6b6b6 !important;
     border-color: #b6b6b6 !important;
